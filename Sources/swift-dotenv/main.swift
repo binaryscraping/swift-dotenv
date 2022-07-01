@@ -20,25 +20,12 @@ struct DotEnv: ParsableCommand {
   var publicAccess = false
 
   func run() throws {
-    let inputURL: URL
-
-    if #available(macOS 13.0, *) {
-      inputURL = URL(filePath: inputFile)
-    } else {
-      inputURL = URL(fileURLWithPath: inputFile)
-    }
+    let inputURL = URL(fileURLWithPath: inputFile)
+    let outputURL = URL(fileURLWithPath: outputFile)
 
     let parser = DotEnvParser()
     let config = try parser.parse(fromContentsOf: inputURL)
     let generator = CodeGenerator(configuration: config)
-
-    let outputURL: URL
-
-    if #available(macOS 13.0, *) {
-      outputURL = URL(filePath: outputFile)
-    } else {
-      outputURL = URL(fileURLWithPath: outputFile)
-    }
 
     try generator.write(
       to: outputURL, with: .init(namespace: namespace, publicAccess: publicAccess))
