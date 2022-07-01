@@ -28,45 +28,19 @@ struct DotEnv: ParsableCommand {
       inputURL = URL(fileURLWithPath: inputFile)
     }
 
-    let result = try DotEnvCore.DotEnv.load(from: inputURL)
+    let config = try DotEnvCore.DotEnv.load(from: inputURL)
 
-    let access = publicAccess ? "public " : ""
-
-    var generatedCode = """
-      \(access)enum \(namespace) {\n
-      """
-
-    for config in result.entries {
-      generatedCode.append(
-        "  \(access)static let \(config.key) = \"\(config.value)\"\n"
-      )
-    }
-
-    generatedCode.append("}")
-
-    let output = generatedCode.data(using: .utf8) ?? Data()
+    let outputURL: URL
 
     if #available(macOS 13.0, *) {
-      try output.write(to: URL(filePath: outputFile))
+      outputURL = URL(filePath: outputFile)
     } else {
-      try output.write(to: URL(fileURLWithPath: outputFile))
-    }
-  }
-
-  func parse(_ input: String) -> [(key: String, value: String)] {
-    var configs: [(key: String, value: String)] = []
-    let lines = input.split(separator: "\n")
-
-    for line in lines {
-      let components =
-        line
-        .split(separator: "=")
-        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-      assert(components.count == 2)
-      configs.append((key: components[0], value: components[1]))
+      outputURL = URL(fileURLWithPath: outputFile)
     }
 
-    return configs
+    let generator = CodeGenerator(
+      configuration: config, namespace: namespace, publicAccess: publicAccess)
+    try generator.write(to: outputURL)
   }
 }
 

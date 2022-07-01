@@ -1,8 +1,8 @@
 import Foundation
 
 public enum DotEnv {
-  public struct Configuration {
-    public struct Entry {
+  public struct Configuration: Equatable {
+    public struct Entry: Equatable {
       public let key: String
       public let value: String
     }
@@ -12,6 +12,10 @@ public enum DotEnv {
 
   public static func load(from url: URL) throws -> Configuration {
     let contents = try String(contentsOf: url)
+    return try parse(from: contents)
+  }
+
+  public static func parse(from contents: String) throws -> Configuration {
     var entries: [Configuration.Entry] = []
     let lines = contents.split(separator: "\n")
 

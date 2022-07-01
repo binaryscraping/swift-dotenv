@@ -12,14 +12,16 @@ let package = Package(
     .plugin(name: "DotEnvPlugin", targets: ["DotEnvPlugin"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.3")
+    .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.3"),
+    .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "0.5.0"),
   ],
   targets: [
     .target(name: "DotEnvCore"),
     .testTarget(
       name: "DotEnvCoreTests",
       dependencies: [
-        "DotEnvCore"
+        "DotEnvCore",
+        .product(name: "CustomDump", package: "swift-custom-dump"),
       ]
     ),
     .executableTarget(
