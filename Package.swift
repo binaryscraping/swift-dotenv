@@ -9,7 +9,6 @@ let package = Package(
   products: [
     .library(name: "DotEnvCore", targets: ["DotEnvCore"]),
     .executable(name: "swift-dotenv", targets: ["swift-dotenv"]),
-    .plugin(name: "DotEnvPlugin", targets: ["DotEnvPlugin"]),
   ],
   dependencies: [
     .package(url: "https://github.com/apple/swift-argument-parser", from: "1.1.3"),
@@ -31,6 +30,5 @@ let package = Package(
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
       ]
     ),
-    .plugin(name: "DotEnvPlugin", capability: .buildTool()),
   ]
 )
