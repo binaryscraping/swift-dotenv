@@ -12,9 +12,9 @@ public struct CodeGenerator {
     }
   }
 
-  let configuration: DotEnv.Configuration
+  let configuration: Configuration
 
-  public init(configuration: DotEnv.Configuration) {
+  public init(configuration: Configuration) {
     self.configuration = configuration
   }
 

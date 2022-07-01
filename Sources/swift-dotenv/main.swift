@@ -28,7 +28,8 @@ struct DotEnv: ParsableCommand {
       inputURL = URL(fileURLWithPath: inputFile)
     }
 
-    let config = try DotEnvCore.DotEnv.load(from: inputURL)
+    let parser = DotEnvParser()
+    let config = try parser.parse(fromContentsOf: inputURL)
     let generator = CodeGenerator(configuration: config)
 
     let outputURL: URL

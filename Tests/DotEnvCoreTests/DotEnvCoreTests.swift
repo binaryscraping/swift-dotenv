@@ -9,13 +9,18 @@ final class DotEnvTests: XCTestCase {
     SUPABASE_ANON_KEY=abc.def.ghi
     """
 
+  let malformedInput = """
+    SUPABASE_URL=http://localhost=:3000
+    SUPABASE_ANON_KEY=abc.def.ghi
+    """
+
   func testParse() throws {
-    let config = try DotEnv.parse(from: input)
+    let config = try DotEnvParser().parse(from: input)
 
     XCTAssertNoDifference(
       config,
       .init(
-        entries: [
+        [
           .init(key: "SUPABASE_URL", value: "http://localhost:3000"),
           .init(key: "SUPABASE_ANON_KEY", value: "abc.def.ghi"),
         ]
@@ -23,8 +28,20 @@ final class DotEnvTests: XCTestCase {
     )
   }
 
+  func testParseWithMalformedFile() {
+    do {
+      _ = try DotEnvParser().parse(from: malformedInput)
+      XCTFail("Test should fail")
+    } catch let ParserError.unexpectedEntry(position, contents) {
+      XCTAssertEqual(position, 1)
+      XCTAssertEqual(contents, "SUPABASE_URL=http://localhost=:3000")
+    } catch {
+      XCTFail("Test failed with unexpected error: \(error.localizedDescription)")
+    }
+  }
+
   func testGenerate() throws {
-    let config = try DotEnv.parse(from: input)
+    let config = try DotEnvParser().parse(from: input)
     let generator = CodeGenerator(configuration: config)
 
     let code = generator.generate(
@@ -46,7 +63,7 @@ final class DotEnvTests: XCTestCase {
   }
 
   func testGeneratePublic() throws {
-    let config = try DotEnv.parse(from: input)
+    let config = try DotEnvParser().parse(from: input)
     let generator = CodeGenerator(configuration: config)
 
     let code = generator.generate(
