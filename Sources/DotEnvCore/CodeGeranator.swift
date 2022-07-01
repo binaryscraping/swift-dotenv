@@ -2,25 +2,27 @@ import Foundation
 
 public struct CodeGenerator {
 
-  let configuration: DotEnv.Configuration
-  let namespace: String
-  let publicAccess: Bool
+  public struct Options {
+    let namespace: String
+    let publicAccess: Bool
 
-  public init(
-    configuration: DotEnv.Configuration,
-    namespace: String,
-    publicAccess: Bool
-  ) {
-    self.configuration = configuration
-    self.namespace = namespace
-    self.publicAccess = publicAccess
+    public init(namespace: String, publicAccess: Bool) {
+      self.namespace = namespace
+      self.publicAccess = publicAccess
+    }
   }
 
-  public func generate() -> String {
-    let access = publicAccess ? "public " : ""
+  let configuration: DotEnv.Configuration
+
+  public init(configuration: DotEnv.Configuration) {
+    self.configuration = configuration
+  }
+
+  public func generate(options: Options) -> String {
+    let access = options.publicAccess ? "public " : ""
 
     var generatedCode = """
-      \(access)enum \(namespace) {\n
+      \(access)enum \(options.namespace) {\n
       """
 
     for config in configuration.entries {
@@ -33,8 +35,8 @@ public struct CodeGenerator {
     return generatedCode
   }
 
-  public func write(to url: URL) throws {
-    let data = generate().data(using: .utf8) ?? Data()
+  public func write(to url: URL, with options: Options) throws {
+    let data = generate(options: options).data(using: .utf8) ?? Data()
     try data.write(to: url)
   }
 }

@@ -29,6 +29,7 @@ struct DotEnv: ParsableCommand {
     }
 
     let config = try DotEnvCore.DotEnv.load(from: inputURL)
+    let generator = CodeGenerator(configuration: config)
 
     let outputURL: URL
 
@@ -38,9 +39,8 @@ struct DotEnv: ParsableCommand {
       outputURL = URL(fileURLWithPath: outputFile)
     }
 
-    let generator = CodeGenerator(
-      configuration: config, namespace: namespace, publicAccess: publicAccess)
-    try generator.write(to: outputURL)
+    try generator.write(
+      to: outputURL, with: .init(namespace: namespace, publicAccess: publicAccess))
   }
 }
 

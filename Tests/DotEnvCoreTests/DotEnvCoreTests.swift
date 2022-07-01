@@ -14,7 +14,7 @@ final class DotEnvTests: XCTestCase {
 
     XCTAssertNoDifference(
       config,
-      DotEnv.Configuration(
+      .init(
         entries: [
           .init(key: "SUPABASE_URL", value: "http://localhost:3000"),
           .init(key: "SUPABASE_ANON_KEY", value: "abc.def.ghi"),
@@ -25,13 +25,14 @@ final class DotEnvTests: XCTestCase {
 
   func testGenerate() throws {
     let config = try DotEnv.parse(from: input)
-    let generator = CodeGenerator(
-      configuration: config,
-      namespace: "MyNamespace",
-      publicAccess: false
-    )
+    let generator = CodeGenerator(configuration: config)
 
-    let code = generator.generate()
+    let code = generator.generate(
+      options: .init(
+        namespace: "MyNamespace",
+        publicAccess: false
+      )
+    )
 
     XCTAssertNoDifference(
       code,
@@ -46,13 +47,14 @@ final class DotEnvTests: XCTestCase {
 
   func testGeneratePublic() throws {
     let config = try DotEnv.parse(from: input)
-    let generator = CodeGenerator(
-      configuration: config,
-      namespace: "DotEnv",
-      publicAccess: true
-    )
+    let generator = CodeGenerator(configuration: config)
 
-    let code = generator.generate()
+    let code = generator.generate(
+      options: .init(
+        namespace: "DotEnv",
+        publicAccess: true
+      )
+    )
 
     XCTAssertNoDifference(
       code,
