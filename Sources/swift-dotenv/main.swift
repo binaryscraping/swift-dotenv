@@ -1,6 +1,6 @@
 import ArgumentParser
+import DotEnvCore
 import Foundation
-import Parsing
 
 struct DotEnv: ParsableCommand {
   static var configuration = CommandConfiguration(
@@ -20,15 +20,15 @@ struct DotEnv: ParsableCommand {
   var publicAccess = false
 
   func run() throws {
-    let inputData: String
+    let inputURL: URL
 
     if #available(macOS 13.0, *) {
-      inputData = try String(contentsOf: URL(filePath: inputFile))
+      inputURL = URL(filePath: inputFile)
     } else {
-      inputData = try String(contentsOf: URL(fileURLWithPath: inputFile))
+      inputURL = URL(fileURLWithPath: inputFile)
     }
 
-    let result = parse(inputData)
+    let result = try DotEnvCore.DotEnv.load(from: inputURL)
 
     let access = publicAccess ? "public " : ""
 
@@ -36,7 +36,7 @@ struct DotEnv: ParsableCommand {
       \(access)enum \(namespace) {\n
       """
 
-    for config in result {
+    for config in result.entries {
       generatedCode.append(
         "  \(access)static let \(config.key) = \"\(config.value)\"\n"
       )
